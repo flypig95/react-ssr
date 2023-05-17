@@ -7,6 +7,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'dev';
 const isPrd = process.env.NODE_ENV === 'prd';
+process.env.BABEL_ENV ='browsers';//指定 babel 编译环境
 
 function getStyleLoaders(useCss = false) {
   const loaders = [
@@ -47,7 +48,7 @@ function getStyleLoaders(useCss = false) {
 
 module.exports = {
   mode: isDev ? 'development' : 'production',
-  entry: './src/index.jsx',
+  entry: './src/client/index.jsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash:6].js',

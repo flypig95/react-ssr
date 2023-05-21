@@ -1,24 +1,32 @@
 import express from "express";
 import routes from "../routes";
-import { StaticRouter, matchPath } from "react-router-dom";
+import { matchPath } from "react-router-dom";
 import render from "./render";
 const app = express();
 app.use(express.static("dist"));
 
 app.get("*", function (req, res) {
+  console.log(routes, req.url);
   const route = routes.filter((route) => matchPath(route, req.url))[0] || {};
   const { loadData } = route;
+  let html = "";
   if (typeof loadData === "function") {
     const data = loadData();
     const isPromise =
       Object.prototype.toString.call(data) === "[object Promise]";
     if (isPromise) {
-      data.then((result) => {
-        const html = render(req, result);
-        res.send(html);
-      });
+      data
+        .then((result) => {
+          html = render(req, result);
+          res.send(html);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }
+  html = render(req, {});
+  res.send(html);
 });
 
 const server = app.listen(9001, function () {

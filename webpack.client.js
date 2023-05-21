@@ -1,24 +1,24 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 // const { ModuleFederationPlugin } = require('webpack').container;
 
-const isDev = process.env.NODE_ENV === 'dev';
-const isPrd = process.env.NODE_ENV === 'prd';
-process.env.BABEL_ENV ='browsers';//指定 babel 编译环境
+const isDev = process.env.NODE_ENV === "dev";
+const isPrd = process.env.NODE_ENV === "prd";
+process.env.BABEL_ENV = "browsers"; //指定 babel 编译环境
 
 function getStyleLoaders(useCss = false) {
   const loaders = [
     {
-      loader: 'css-loader',
+      loader: "css-loader",
       options: {
         sourceMap: isDev,
       },
     },
     {
-      loader: 'postcss-loader',
+      loader: "postcss-loader",
       options: {
         postcssOptions: {
           sourceMap: isDev,
@@ -26,7 +26,7 @@ function getStyleLoaders(useCss = false) {
       },
     },
     {
-      loader: 'less-loader',
+      loader: "less-loader",
       options: {
         sourceMap: isDev,
       },
@@ -41,17 +41,17 @@ function getStyleLoaders(useCss = false) {
     });
   }
   if (isDev) {
-    loaders.unshift({ loader: 'style-loader' });
+    loaders.unshift({ loader: "style-loader" });
   }
   return loaders;
 }
 
 module.exports = {
-  mode: isDev ? 'development' : 'production',
-  entry: './src/client/index.jsx',
+  mode: isDev ? "development" : "production",
+  entry: "./src/client/index.jsx",
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].[contenthash:6].js',
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].[contenthash:6].js",
     // chunkFilename: '[name].[contenthash:6].js',
     // publicPath: '/',
   },
@@ -61,7 +61,7 @@ module.exports = {
         test: /\.[j|t]sx?$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
             cacheDirectory: true,
           },
@@ -77,7 +77,7 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|gif|jpeg|svg)$/,
-        type: 'asset/resource',
+        type: "asset/resource",
         parser: {
           detaUrlCondition: {
             maxSize: 1 * 1024, // 1kb
@@ -86,7 +86,7 @@ module.exports = {
       },
       {
         test: /\.(ttf|otf|woff|woff2|eot)$/,
-        type: 'asset/inline',
+        type: "asset/inline",
         parser: {
           detaUrlCondition: {
             maxSize: 8 * 1024, // 8kb
@@ -95,11 +95,12 @@ module.exports = {
       },
     ],
   },
-  devtool: isDev ? 'eval-cheap-module-source-map' : false,
+  // devtool: isDev ? 'eval-cheap-module-source-map' : false,
+  devtool: false,
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
-      '~': path.resolve(__dirname, './src'),
+      "~": path.resolve(__dirname, "./src"),
     },
   },
   optimization: {
@@ -112,15 +113,15 @@ module.exports = {
       cacheGroups: {
         commons: {
           // 公共的业务模块chunk
-          name: 'commons',
-          chunks: 'all',
+          name: "commons",
+          chunks: "all",
           minChunks: 2,
         },
         vendor: {
           // 第三方模块chunk
-          name: 'vendor',
+          name: "vendor",
           test: /[\\/]node_modules[\\/]/,
-          chunks: 'all',
+          chunks: "all",
           priority: 10,
         },
       },
@@ -130,10 +131,12 @@ module.exports = {
     // },
   },
   plugins: [
-    // new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['!dist/app.js']
+    }),
     new HtmlWebpackPlugin({
-      title: 'react-ssr',
-      template: './index.html',
+      title: "react-ssr",
+      template: "./index.html",
       // favicon: './favicon.ico',
     }),
     new MiniCssExtractPlugin({
@@ -151,24 +154,25 @@ module.exports = {
     // })
   ],
   cache: {
-    type: 'filesystem',
-    cacheDirectory: path.join(__dirname, 'node_modules/.cac/webpack')
+    type: "filesystem",
+    cacheDirectory: path.join(__dirname, "node_modules/.cac/webpack"),
   },
-  devServer: {
-    static: path.resolve(__dirname, 'dist'),
-    open: true,
-    port: 9000,
-    // proxy: {
-    //   '/app-api': {
-    //     target: 'http://api.gymuseum.cn',
-    //     secure: false,
-    //     changeOrigin: true,
-    //   },
-    // },
-    // historyApiFallback: {
-    //   rewrites:[
-    //     { from: /./, to: '/index.html' },
-    //   ]
-    // },
-  },
+  watch: true,
+  // devServer: {
+  //   static: path.resolve(__dirname, "dist"),
+  //   open: true,
+  //   port: 9000,
+  //   // proxy: {
+  //   //   '/app-api': {
+  //   //     target: 'http://api.gymuseum.cn',
+  //   //     secure: false,
+  //   //     changeOrigin: true,
+  //   //   },
+  //   // },
+  //   // historyApiFallback: {
+  //   //   rewrites:[
+  //   //     { from: /./, to: '/index.html' },
+  //   //   ]
+  //   // },
+  // },
 };

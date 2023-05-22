@@ -47,5 +47,5 @@ module.exports = {
       "~": path.resolve(__dirname, "./src"),
     },
   },
-  watch: true,
+  watch: isDev,
 };

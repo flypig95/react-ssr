@@ -95,7 +95,7 @@ module.exports = {
       },
     ],
   },
-  devtool: isDev ? 'eval-cheap-module-source-map' : false,
+  devtool: isDev ? "eval-cheap-module-source-map" : false,
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
@@ -131,12 +131,12 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ['!dist/app.js']
+      cleanOnceBeforeBuildPatterns: ["**/*", "!app.js"],
     }),
     new HtmlWebpackPlugin({
       title: "react-ssr",
       template: "./index.html",
-      favicon: './public/favicon.ico',
+      favicon: "./public/favicon.ico",
     }),
     new MiniCssExtractPlugin({
       filename: `[name].[contenthash:6].css`,
@@ -156,7 +156,7 @@ module.exports = {
     type: "filesystem",
     cacheDirectory: path.join(__dirname, "node_modules/.cac/webpack"),
   },
-  watch: true,
+  watch: isDev,
   // devServer: {
   //   static: path.resolve(__dirname, "dist"),
   //   open: true,

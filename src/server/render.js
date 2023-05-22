@@ -2,17 +2,21 @@ import React from "react";
 import { renderToString } from "react-dom/server";
 import { Route, Routes } from "react-router-dom";
 import { StaticRouter } from "react-router-dom/server";
+import { Provider } from "react-redux";
+import store from "~/store";
 import routes from "../routes";
 
 const render = (req, data) => {
   const content = renderToString(
-    <StaticRouter location={req.url}>
-      <Routes>
-        {routes.map((route) => (
-          <Route {...route} key={route.path} />
-        ))}
-      </Routes>
-    </StaticRouter>
+    <Provider store={store}>
+      <StaticRouter location={req.url}>
+        <Routes>
+          {routes.map((route) => (
+            <Route {...route} key={route.path} />
+          ))}
+        </Routes>
+      </StaticRouter>
+    </Provider>
   );
 
   return `
@@ -24,7 +28,6 @@ const render = (req, data) => {
             state: ${JSON.stringify(data)}
           }
         </script>
-        <script src="/index.js"></script>
       </body>
     </html>
   `;

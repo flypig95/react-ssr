@@ -4,11 +4,17 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import { Provider } from "react-redux";
 import routes from "../routes";
+import store from "~/store";
 // import "./App.less";
 
 const router = createBrowserRouter(routes);
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  );
 }

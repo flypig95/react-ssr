@@ -95,8 +95,7 @@ module.exports = {
       },
     ],
   },
-  // devtool: isDev ? 'eval-cheap-module-source-map' : false,
-  devtool: false,
+  devtool: isDev ? 'eval-cheap-module-source-map' : false,
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
@@ -137,7 +136,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "react-ssr",
       template: "./index.html",
-      // favicon: './favicon.ico',
+      favicon: './public/favicon.ico',
     }),
     new MiniCssExtractPlugin({
       filename: `[name].[contenthash:6].css`,

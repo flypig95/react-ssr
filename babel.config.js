@@ -33,6 +33,8 @@ module.exports = (api) => {
               corejs: false,
             },
           ],
+          // "@babel/plugin-syntax-dynamic-import",
+          // "@babel/plugin-proposal-class-properties",
         ],
       },
       node: {
@@ -47,11 +49,11 @@ module.exports = (api) => {
           ],
           "@babel/preset-react",
         ],
-        // plugins: [
-        //   "@babel/plugin-syntax-dynamic-import",
-        //   "@babel/plugin-proposal-class-properties",
-        //   "./webpack/babel/plugin/no-require-css",
-        // ],
+        plugins: [
+          "@babel/plugin-transform-runtime",
+          // "@babel/plugin-syntax-dynamic-import",
+          // "@babel/plugin-proposal-class-properties",
+        ],
       },
     },
   };

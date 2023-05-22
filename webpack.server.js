@@ -40,8 +40,7 @@ module.exports = {
     filename: "app.js",
     path: path.resolve(__dirname, "./dist"),
   },
-  // devtool: isDev ? 'eval-cheap-module-source-map' : false,
-  devtool: false,
+  devtool: isDev ? "eval-cheap-module-source-map" : false,
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {

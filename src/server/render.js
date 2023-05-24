@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { Route, Routes } from "react-router-dom";
@@ -6,7 +8,9 @@ import { Provider } from "react-redux";
 import store from "~/store";
 import routes from "../routes";
 
-const render = (req, data) => {
+const render = (req) => {
+  const state = store.getState();
+  const dataStr = `<script>window.__data = ${JSON.stringify(state)}</script>`;
   const content = renderToString(
     <Provider store={store}>
       <StaticRouter location={req.url}>
@@ -18,19 +22,16 @@ const render = (req, data) => {
       </StaticRouter>
     </Provider>
   );
+  const templateStr = fs.readFileSync(
+    path.resolve(process.cwd(), "dist/ssr.html"),
+    "utf8"
+  );
 
-  return `
-    <html>
-      <body>
-        <div id="root">${content}</div>
-        <script>
-          window.context = {
-            state: ${JSON.stringify(data)}
-          }
-        </script>
-      </body>
-    </html>
-  `;
+  const htmlStr = templateStr
+    .replace(/(<div id="root">).*(<\/div>)/g, `$1${content}$2`)
+    .replace(/<\/body>/g, `${dataStr}\n</body>`);
+
+  return htmlStr;
 };
 
 export default render;

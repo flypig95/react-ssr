@@ -45,6 +45,7 @@ module.exports = (api) => {
               targets: {
                 node: "current",
               },
+              modules: "commonjs", // es模块转换成其他的模块语法
             },
           ],
           "@babel/preset-react",

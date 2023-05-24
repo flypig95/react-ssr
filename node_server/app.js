@@ -1,9 +1,16 @@
-const express = require('express')
-
+const express = require("express");
+const path = require("path");
 const app = express();
 
-app.use(express.static('public'))
+app.use(express.static("public"));
 
-app.listen(9002,()=>{
-    console.log('9002')
-})
+app.get("/json", (req, res) => {
+  setTimeout(() => {
+    res.sendFile(path.resolve(process.cwd(), "public/api/newData.json"));
+    // res.json({name: 'chencong'})
+  }, 5000);
+});
+
+app.listen(9002, () => {
+  console.log("9002");
+});

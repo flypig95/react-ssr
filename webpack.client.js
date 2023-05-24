@@ -52,8 +52,8 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].[contenthash:6].js",
-    // chunkFilename: '[name].[contenthash:6].js',
-    // publicPath: '/',
+    chunkFilename: "[name].[contenthash:6].js",
+    // publicPath: '/dist',
   },
   module: {
     rules: [
@@ -136,7 +136,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "react-ssr",
       template: "./index.html",
-      favicon: "./public/favicon.ico",
+      favicon: "./favicon.ico",
+      filename: "ssr.html",
+      // minify: {
+      //   collapseWhitespace: true, //删除空格、换行
+      // },
     }),
     new MiniCssExtractPlugin({
       filename: `[name].[contenthash:6].css`,

@@ -1,32 +1,38 @@
+import path from "path";
+import fs from "fs";
 import express from "express";
 import routes from "../routes";
 import { matchPath } from "react-router-dom";
 import render from "./render";
+import store from "~/store";
 const app = express();
-app.use(express.static("public"));
+app.use(express.static("dist"));
 
-app.get("*", function (req, res) {
-  const route = routes.filter((route) => matchPath(route, req.url))[0] || {};
-  const { loadData } = route;
-  let html = "";
-  if (typeof loadData === "function") {
-    const data = loadData();
-    console.log(routes, req.url, new Date().toLocaleString());
-    const isPromise =
-      Object.prototype.toString.call(data) === "[object Promise]";
-    if (isPromise) {
-      data
-        .then((result) => {
-          html = render(req, result);
-          res.send(html);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+app.get("*", function (req, res, next) {
+  console.log(req.url);
+  const route = routes.filter((route) => matchPath(route, req.url))[0];
+  if (route) {
+    const { loadData } = route;
+    if (typeof loadData === "function") {
+      loadData(store);
+      const unsubscribe = store.subscribe(() => {
+        let html = "";
+        try {
+          html = render(req);
+        } catch (err) {
+          html = fs.readFileSync(
+            path.resolve(process.cwd(), "dist/ssr.html"),
+            "utf8"
+          );
+        }
+        res.send(html);
+        unsubscribe();
+      });
+    } else {
+      res.sendFile(path.resolve(process.cwd(), "dist/ssr.html"));
     }
   } else {
-    html = render(req, {});
-    res.send(html);
+    res.sendStatus(404);
   }
 });
 

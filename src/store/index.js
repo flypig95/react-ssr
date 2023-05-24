@@ -1,10 +1,10 @@
 import { createStore, combineReducers } from "redux";
+import homeReducer from "~/client/home/reducer";
 
 const rootReducer = combineReducers({
-  home: require("~/client/home/reducer"),
+  home: homeReducer,
 });
 
-const initState =
-  typeof window === "undefined" ? {} : window?.context?.state || {};
+const initState = typeof window === "undefined" ? {} : window.__data || {};
 
 export default createStore(rootReducer, initState);

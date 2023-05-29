@@ -8,7 +8,7 @@ app.get("/json", (req, res) => {
   setTimeout(() => {
     res.sendFile(path.resolve(process.cwd(), "public/api/newData.json"));
     // res.json({name: 'chencong'})
-  }, 5000);
+  }, 3000);
 });
 
 app.listen(9002, () => {

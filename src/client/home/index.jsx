@@ -8,10 +8,10 @@ export default function Home() {
 }
 
 Home.loadData = (store) => {
-  service.getNewData().then((res) => {
+  return Promise.all([service.getNewData()]).then(([data]) => {
     store.dispatch({
       type: GET_LIST,
-      payload: res,
+      payload: data,
     });
   });
 };

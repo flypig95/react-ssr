@@ -22,18 +22,20 @@ module.exports = {
           },
         },
       },
-      // {
-      //   test: /\.css?$/,
-      //   use: [
-      //     "isomorphic-style-loader",
-      //     {
-      //       loader: "css-loader",
-      //       options: {
-      //         modules: true,
-      //       },
-      //     },
-      //   ],
-      // },
+      {
+        test: /\.(css|less)?$/,
+        use: [
+          "isomorphic-style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              esModule: false,
+              modules: true,
+            },
+          },
+          "postcss-loader",
+        ],
+      },
     ],
   },
   output: {

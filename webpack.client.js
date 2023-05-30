@@ -9,44 +9,7 @@ const isDev = process.env.NODE_ENV === "dev";
 const isPrd = process.env.NODE_ENV === "prd";
 process.env.BABEL_ENV = "browsers"; //指定 babel 编译环境
 
-function getStyleLoaders(useCss = false) {
-  const loaders = [
-    {
-      loader: "css-loader",
-      options: {
-        sourceMap: isDev,
-      },
-    },
-    {
-      loader: "postcss-loader",
-      options: {
-        postcssOptions: {
-          sourceMap: isDev,
-        },
-      },
-    },
-    {
-      loader: "less-loader",
-      options: {
-        sourceMap: isDev,
-      },
-    },
-  ];
-  if (useCss) {
-    loaders.pop();
-  }
-  if (isPrd) {
-    loaders.unshift({
-      loader: MiniCssExtractPlugin.loader,
-    });
-  }
-  if (isDev) {
-    loaders.unshift({ loader: "style-loader" });
-  }
-  return loaders;
-}
-
-module.exports = {
+const config = {
   mode: isDev ? "development" : "production",
   entry: "./src/client/index.jsx",
   output: {
@@ -66,14 +29,6 @@ module.exports = {
             cacheDirectory: true,
           },
         },
-      },
-      {
-        test: /\.less$/,
-        use: getStyleLoaders(),
-      },
-      {
-        test: /\.css$/,
-        use: getStyleLoaders(true),
       },
       {
         test: /\.(png|jpg|gif|jpeg|svg)$/,
@@ -142,10 +97,10 @@ module.exports = {
       //   collapseWhitespace: true, //删除空格、换行
       // },
     }),
-    new MiniCssExtractPlugin({
-      filename: `[name].[contenthash:6].css`,
-      chunkFilename: `[name].[contenthash:6].css`,
-    }),
+    // new MiniCssExtractPlugin({
+    //   filename: `[name].[contenthash:6].css`,
+    //   chunkFilename: `[name].[contenthash:6].css`,
+    // }),
     // new ModuleFederationPlugin({
     //   name: 'pc',
     //   filename: 'remoteEntry.js',
@@ -179,3 +134,81 @@ module.exports = {
   //   // },
   // },
 };
+
+// 样式处理start
+function getStyleLoaders(useCss = false) {
+  const loaders = [
+    {
+      loader: "css-loader",
+      options: {
+        sourceMap: isDev,
+      },
+    },
+    {
+      loader: "postcss-loader",
+      options: {
+        postcssOptions: {
+          sourceMap: isDev,
+        },
+      },
+    },
+    {
+      loader: "less-loader",
+      options: {
+        sourceMap: isDev,
+      },
+    },
+  ];
+  if (useCss) {
+    loaders.pop();
+  }
+  if (isPrd) {
+    loaders.unshift({
+      loader: MiniCssExtractPlugin.loader,
+    });
+  }
+  if (isDev) {
+    loaders.unshift({ loader: "style-loader" });
+  }
+  return loaders;
+}
+
+const isStyleIsomorphic = false;
+const styleIsomorphicRule = {
+  test: /\.(css|less)?$/,
+  use: [
+    "isomorphic-style-loader",
+    {
+      loader: "css-loader",
+      options: {
+        esModule: false,
+        modules: true,
+      },
+    },
+    "postcss-loader",
+  ],
+};
+const styleRules = [
+  {
+    test: /\.less$/,
+    use: getStyleLoaders(),
+  },
+  {
+    test: /\.css$/,
+    use: getStyleLoaders(true),
+  },
+];
+if (isStyleIsomorphic) {
+  config.module.rules.push(styleIsomorphicRule);
+} else {
+  config.module.rules = config.module.rules.concat(styleRules);
+  config.plugins.push(
+    new MiniCssExtractPlugin({
+      filename: `[name].[contenthash:6].css`,
+      chunkFilename: `[name].[contenthash:6].css`,
+    })
+  );
+}
+// 样式处理end
+
+module.exports = config;

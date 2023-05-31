@@ -5,9 +5,9 @@
   "main": "./dist/app.js",
   "scripts": {
     "dev": "npm run dev:client & npm run dev:server & nodemon",
-    "dev:client": "NODE_ENV=dev webpack --config webpack.client.js",
+    "dev:client": "NODE_ENV=dev NODE_STYLE_ISOMORPHIC=true webpack --config webpack.client.js",
     "dev:server": "NODE_ENV=dev webpack --config webpack.server.js",
-    "prd": "npm run prd:client && npm run prd:server && pm2 restart ./dist/app.js",
+    "prd": "npm run prd:client && npm run prd:server && pm2 restart ./dist/app.js -i -1",
     "prd:client": "NODE_ENV=prd webpack --config webpack.client.js",
     "prd:server": "NODE_ENV=prd webpack --config webpack.server.js"
   },

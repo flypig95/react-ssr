@@ -7,16 +7,16 @@ const mydata = [
     link: '#apply-form',
     showButton: true,
   },
-  // {
-  //   image: '//static.zuifuli.com/images/new-year-2022.jpg',
-  //   link: 'https://www.zuifuli.com/mkt/newyear2022.html',
-  //   // showButton: false,
-  // },
-  // {
-  //   image: '//static.zuifuli.com/images/banner-xman.png',
-  //   link: '#',
-  //   showButton: false,
-  // },
+  {
+    image: '//static.zuifuli.com/images/new-year-2022.jpg',
+    link: 'https://www.zuifuli.com/mkt/newyear2022.html',
+    // showButton: false,
+  },
+  {
+    image: '//static.zuifuli.com/images/banner-xman.png',
+    link: '#',
+    showButton: false,
+  },
 ];
 
 export default function Banner() {

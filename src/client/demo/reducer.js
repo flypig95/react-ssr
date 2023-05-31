@@ -1,6 +1,6 @@
 export const GET_LIST = "home/get_list";
 const defaultState = {
-  age: 123,
+  name: '',
 };
 
 export default (state = defaultState, action = {}) => {

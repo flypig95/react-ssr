@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import useStyles from "isomorphic-style-loader/useStyles";
 import { GET_LIST } from "./reducer";
 import * as service from "./service";
-import Content from "./Content";
+import Header from "./Header";
+import s from "../common/base.less";
 export default function Demo() {
+  useStyles(s);
   const state = useSelector((state) => state.demo) || {};
   return (
     <div className="page-home">
-      <Content />
+      <Header />
     </div>
   );
 }

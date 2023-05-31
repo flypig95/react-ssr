@@ -7,10 +7,9 @@ app.use(express.static("public"));
 app.get("/json", (req, res) => {
   setTimeout(() => {
     res.sendFile(path.resolve(process.cwd(), "public/api/newData.json"));
-    // res.json({name: 'chencong'})
-  }, 3000);
+  }, 2000);
 });
 
-app.listen(9002, () => {
-  console.log("9002");
+app.listen(3001, () => {
+  console.log("api服务启动，3001");
 });

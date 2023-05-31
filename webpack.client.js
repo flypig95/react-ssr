@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const webpack = require("webpack");
 // const { ModuleFederationPlugin } = require('webpack').container;
 
 const isDev = process.env.NODE_ENV === "dev";
@@ -97,6 +98,9 @@ const config = {
       //   collapseWhitespace: true, //删除空格、换行
       // },
     }),
+    new webpack.DefinePlugin({
+      __STYLE_ISOMORPHIC__: process.env.NODE_STYLE_ISOMORPHIC,
+    }),
     // new MiniCssExtractPlugin({
     //   filename: `[name].[contenthash:6].css`,
     //   chunkFilename: `[name].[contenthash:6].css`,
@@ -173,7 +177,7 @@ function getStyleLoaders(useCss = false) {
   return loaders;
 }
 
-const isStyleIsomorphic = false;
+const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true";
 const styleIsomorphicRule = {
   test: /\.(css|less)?$/,
   use: [
@@ -186,6 +190,7 @@ const styleIsomorphicRule = {
       },
     },
     "postcss-loader",
+    "less-loader",
   ],
 };
 const styleRules = [

@@ -18,7 +18,7 @@ const routers = [
   {
     path: "/demo",
     Component: Demo,
-    loadData: Home.loadData,
+    loadData: Demo.loadData,
   },
 ];
 

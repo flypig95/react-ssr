@@ -5,8 +5,6 @@ import routes from "../routes";
 import { matchPath } from "react-router-dom";
 import render from "./render";
 import store from "~/store";
-const app = express();
-app.use(express.static("dist"));
 
 /*
  保证node服务器稳定
@@ -19,37 +17,40 @@ app.use(express.static("dist"));
 //   console.log("Caught exception: " + err);
 // });
 
+const app = express();
+app.use(express.static("dist"));
+
 // 中间件不要加async，否则错误处理中间件无法执行
 app.get("*", function (req, res) {
   const route = routes.filter((route) => matchPath(route, req.url))[0];
   if (route) {
+    if (route.loadData) route.ssr = true;
     const { loadData, ssr } = route;
-    if (loadData) {
-      const unsubscribe = store.subscribe(() => {
-        let html = "";
-        try {
-          html = render({ url: req.url, route });
-        } catch (err) {
-          html = fs.readFileSync(
-            path.resolve(process.cwd(), "dist/ssr.html"),
-            "utf8"
-          );
-        }
-        res.send(html);
-        unsubscribe();
-      });
+    if (ssr) {
+      if (loadData) {
+        const unsubscribe = store.subscribe(() => {
+          let html = "";
+          try {
+            html = render({ url: req.url, route });
+          } catch (err) {
+            html = fs.readFileSync(
+              path.resolve(process.cwd(), "dist/ssr.html"),
+              "utf8"
+            );
+          }
+          res.send(html);
+          unsubscribe();
+        });
 
-      loadData(store).catch((err) => {
-        toClientRender(res);
-        unsubscribe();
-        return;
-      });
-    } else {
-      if (ssr) {
-        res.send(render({ url: req.url, route }));
+        loadData(store).catch((err) => {
+          toClientRender(res);
+          unsubscribe();
+        });
       } else {
-        toClientRender(res);
+        res.send(render({ url: req.url, route }));
       }
+    } else {
+      toClientRender(res);
     }
   } else {
     res.sendStatus(404);
@@ -66,7 +67,7 @@ function toClientRender(res) {
   res.sendFile(path.resolve(process.cwd(), "dist/ssr.html"));
 }
 
-const server = app.listen(3001, function (err, a) {
+const server = app.listen(3000, function (err, a) {
   const host = server.address().address;
   const port = server.address().port;
   console.log("应用实例，访问地址为 http://%s:%s", host, port);

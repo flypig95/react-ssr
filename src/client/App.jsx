@@ -25,15 +25,16 @@ const insertCss = (...styles) => {
 const router = createBrowserRouter(routes);
 
 export default function App() {
-  return isStyleIsomorphic ? (
-    <StyleContext.Provider value={{ insertCss }}>
-      <Provider store={store}>
-        <RouterProvider router={router} />
-      </Provider>
-    </StyleContext.Provider>
-  ) : (
+  const content = (
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
+  );
+  return isStyleIsomorphic ? (
+    <StyleContext.Provider value={{ insertCss }}>
+      {content}
+    </StyleContext.Provider>
+  ) : (
+    content
   );
 }

@@ -1,6 +1,6 @@
-import React from "react";
 import Home from "./client/home";
 import Login from "./client/login";
+import Demo from "./client/demo";
 
 const routers = [
   {
@@ -9,13 +9,16 @@ const routers = [
     // element: <Home />,
     Component: Home,
     ssr: true,
-    loadData: Home.loadData,
   },
   {
     path: "/login",
     exact: true,
     Component: Login,
-    ssr: true,
+  },
+  {
+    path: "/demo",
+    Component: Demo,
+    loadData: Home.loadData,
   },
 ];
 

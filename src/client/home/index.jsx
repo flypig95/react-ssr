@@ -1,24 +1,17 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { GET_LIST } from "./reducer";
-import * as service from "./service";
-import Header from "./Header";
-import Content from "./Content";
-export default function Home() {
-  const state = useSelector((state) => state.home) || {};
+import React from "react";
+import { Helmet } from "react-helmet";
+import Banner from "~/client/home/Banner";
+
+export default function Home({ list = [] }) {
   return (
-    <div className="page-home">
-      {/* <Header /> */}
-      <Content />
-    </div>
+    <>
+      <Helmet>
+        <title>首页</title>
+        <meta name="name" content="content" />
+      </Helmet>
+      <div className="page-wrapper homepage">
+        <Banner />
+      </div>
+    </>
   );
 }
-
-Home.loadData = (store) => {
-  return Promise.all([service.getNewData()]).then(([data]) => {
-    store.dispatch({
-      type: GET_LIST,
-      payload: data,
-    });
-  });
-};

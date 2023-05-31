@@ -23,12 +23,12 @@ app.use(express.static("dist"));
 app.get("*", function (req, res) {
   const route = routes.filter((route) => matchPath(route, req.url))[0];
   if (route) {
-    const { loadData } = route;
+    const { loadData, ssr } = route;
     if (loadData) {
       const unsubscribe = store.subscribe(() => {
         let html = "";
         try {
-          html = render(req);
+          html = render({ url: req.url, route });
         } catch (err) {
           html = fs.readFileSync(
             path.resolve(process.cwd(), "dist/ssr.html"),
@@ -45,7 +45,11 @@ app.get("*", function (req, res) {
         return;
       });
     } else {
-      toClientRender(res);
+      if (ssr) {
+        res.send(render({ url: req.url, route }));
+      } else {
+        toClientRender(res);
+      }
     }
   } else {
     res.sendStatus(404);

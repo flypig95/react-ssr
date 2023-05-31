@@ -1,8 +1,8 @@
 import { createStore, combineReducers } from "redux";
-import homeReducer from "~/client/home/reducer";
+import demoReducer from "~/client/demo/reducer";
 
 const rootReducer = combineReducers({
-  home: homeReducer,
+  demo: demoReducer,
 });
 
 const initState = typeof window === "undefined" ? {} : window.__data || {};

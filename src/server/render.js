@@ -6,23 +6,28 @@ import { Route, Routes } from "react-router-dom";
 import { StaticRouter } from "react-router-dom/server";
 import { Provider } from "react-redux";
 import StyleContext from "isomorphic-style-loader/StyleContext";
+import { Helmet } from "react-helmet";
 import store from "~/store";
 import routes from "../routes";
 
-const render = (req) => {
+const render = ({ url, route }) => {
   const css = new Set(); // CSS for all rendered React components
   const insertCss = (...styles) => {
     styles.forEach((style) => {
       css.add(style._getCss());
     });
   };
-
+  const helmet = Helmet.renderStatic();
+  const helmetStr = `${helmet.title.toString()}\n${helmet.meta.toString()}`;
   const state = store.getState();
-  const dataStr = `<script>window.__data = ${JSON.stringify(state)}</script>`;
+  const dataStr =
+    route.ssr && !route.loadData
+      ? ""
+      : `<script>window.__data = ${JSON.stringify(state)}</script>`;
   const content = renderToString(
     <StyleContext.Provider value={{ insertCss }}>
       <Provider store={store}>
-        <StaticRouter location={req.url}>
+        <StaticRouter location={url}>
           <Routes>
             {routes.map((route) => (
               <Route {...route} key={route.path} />
@@ -42,7 +47,7 @@ const render = (req) => {
     .replace(/<\/body>/g, `${dataStr}\n</body>`)
     .replace(
       /<\/head>/g,
-      `<style type="text/css">${[...css].join("")}</style>\n</head>`
+      `\n${helmetStr}\n<style type="text/css">${[...css].join("")}</style>\n</head>`
     );
 
   return htmlStr;

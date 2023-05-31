@@ -8,12 +8,14 @@ const routers = [
     exact: true,
     // element: <Home />,
     Component: Home,
+    ssr: true,
     loadData: Home.loadData,
   },
   {
     path: "/login",
     exact: true,
     Component: Login,
+    ssr: true,
   },
 ];
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Helmet } from "react-helmet";
 import Banner from "~/client/home/Banner";
 
-export default function Home({ list = [] }) {
+export default function Home() {
   return (
     <>
       <Helmet>

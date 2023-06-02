@@ -1,20 +1,20 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import './Banner.less';
+import React, { useEffect, useState, useCallback } from "react";
+import "./Banner.less";
 
 const mydata = [
   {
-    image: '//static.zuifuli.com/images/newsite/banner-home1.png',
-    link: '#apply-form',
+    image: "//static.zuifuli.com/images/newsite/banner-home1.png",
+    link: "#apply-form",
     showButton: true,
   },
   {
-    image: '//static.zuifuli.com/images/new-year-2022.jpg',
-    link: 'https://www.zuifuli.com/mkt/newyear2022.html',
+    image: "//static.zuifuli.com/images/new-year-2022.jpg",
+    link: "https://www.zuifuli.com/mkt/newyear2022.html",
     // showButton: false,
   },
   {
-    image: '//static.zuifuli.com/images/banner-xman.png',
-    link: '#',
+    image: "//static.zuifuli.com/images/banner-xman.png",
+    link: "#",
     showButton: false,
   },
 ];
@@ -47,13 +47,19 @@ export default function Banner() {
         <div
           key={idx}
           style={{ backgroundImage: `url(${item.image})` }}
-          className={`banner ${index === idx ? 'active' : ''}`}
+          className={`banner ${index === idx ? "active" : ""}`}
         ></div>
       ))}
 
-      <a href={data[index].link} target={data[index].link[0] == '#' ? '_self' : '_blank'}>
+      <a
+        href={data[index].link}
+        target={data[index].link[0] == "#" ? "_self" : "_blank"}
+      >
         <div className="content">
-          <div className="btn-try" style={{ display: data[index].showButton ? '' : 'none' }}>
+          <div
+            className="btn-try"
+            style={{ display: data[index].showButton ? "" : "none" }}
+          >
             申请试用
           </div>
         </div>
@@ -70,7 +76,9 @@ export default function Banner() {
                 }}
               >
                 <div
-                  className={`line ${index == idx ? 'active' : ''} ${clicked ? 'clicked' : ''}`}
+                  className={`line ${index == idx ? "active" : ""} ${
+                    clicked ? "clicked" : ""
+                  }`}
                 ></div>
               </a>
             ))

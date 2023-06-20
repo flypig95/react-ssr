@@ -6,11 +6,10 @@ WORKDIR /root/app
 
 COPY package.json /root/app/ 
 COPY .npmrc /root/app/
-RUN npm install 
+RUN yarn 
 
 COPY . /root/app/
-
-RUN npm run build:prd
+RUN yarn build:prd
 
 EXPOSE 8080
-CMD ["npm", "run", "server"]
+CMD ["yarn", "server"]

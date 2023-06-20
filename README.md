@@ -4,8 +4,8 @@ react、redux、less、express、webpack
 ## 启动项目
 
 1. node 版本 v16.13
-2. npm install nodemon pm2 -g
-3. cd node_server，node app.js 启动 mock 数据服务，npm run dev 启动项目，浏览器访问地址 localhost:3000/demo
+2. npm install nodemon -g
+3. cd node_server，node app.js 启动 mock 数据服务，npm run dev 启动项目，浏览器访问地址 localhost:8080/demo
 
 ## 开发事项
 
@@ -36,7 +36,7 @@ Demo.loadData = (store) =>
   });
 ```
 
-3. 支持样式同构，设置 node 环境变量 NODE_STYLE_ISOMORPHIC=true, 如 pacakge.json-->script-->dev:client。然后访问 http://localhost:3000/demo。
+3. 支持样式同构，设置 node 环境变量 NODE_STYLE_ISOMORPHIC=true, 如 pacakge.json-->script-->dev:client。然后访问 http://localhost:8080/demo。
 样式同构可以避免页面闪动的问题，启用样式同构后需以 css modues 的形式编写样式。
 使用 rem 单位时无法避免页面闪动，此时不推荐启用样式同构。
 
@@ -44,4 +44,4 @@ Demo.loadData = (store) =>
 
 1. express 同步代码的错误，错误处理中间件
 2. 异步代码（promise）错误，loadData 中所有的请求都要放在 promise.all 中，并且返回 promise.all()
-3. 使用 pm2 做 node 进程管理，集群模式创建多个应用实例负载均衡保证服务器的稳定，服务器崩溃后会自动重启
+3. 生产环境部署阶段，使用docker-compose启动应用容器，配置restart: always，让容器停止运行后能够自动重启。还可启动多个应用容器，配合nginx的负载均衡。

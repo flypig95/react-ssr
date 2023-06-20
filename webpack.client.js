@@ -9,6 +9,7 @@ const webpack = require("webpack");
 const isDev = process.env.NODE_ENV === "dev";
 const isPrd = process.env.NODE_ENV === "prd";
 process.env.BABEL_ENV = "browsers"; //指定 babel 编译环境
+const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true"; // 是否样式同构
 
 const config = {
   mode: isDev ? "development" : "production",
@@ -59,10 +60,11 @@ const config = {
     },
   },
   optimization: {
-    usedExports: isPrd,
+    // mode: production下usedExports、sideEffects、minimize默认为true
+    // usedExports: isPrd,
     // sideEffects: isPrd,
-    minimize: isPrd,
-    minimizer: [`...`, new CssMinimizerPlugin()],
+    // minimize: isPrd,
+    minimizer: isStyleIsomorphic ? [`...`] : [`...`, new CssMinimizerPlugin()],
     splitChunks: {
       name: false,
       cacheGroups: {
@@ -99,7 +101,7 @@ const config = {
       // },
     }),
     new webpack.DefinePlugin({
-      __STYLE_ISOMORPHIC__: process.env.NODE_STYLE_ISOMORPHIC,
+      __STYLE_ISOMORPHIC__: JSON.stringify(isStyleIsomorphic),
     }),
     // new MiniCssExtractPlugin({
     //   filename: `[name].[contenthash:6].css`,
@@ -177,8 +179,7 @@ function getStyleLoaders(useCss = false) {
   return loaders;
 }
 
-const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true";
-const styleIsomorphicRule = {
+const styleIsomorphicRules = {
   test: /\.(css|less)?$/,
   use: [
     "isomorphic-style-loader",
@@ -204,7 +205,7 @@ const styleRules = [
   },
 ];
 if (isStyleIsomorphic) {
-  config.module.rules.push(styleIsomorphicRule);
+  config.module.rules.push(styleIsomorphicRules);
 } else {
   config.module.rules = config.module.rules.concat(styleRules);
   config.plugins.push(

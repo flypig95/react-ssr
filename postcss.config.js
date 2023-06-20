@@ -19,9 +19,9 @@ module.exports = (api) => {
     ],
   ];
 
-  if (!/node_modules/.test(api.file)) {
-    plugins.unshift(px2rem({ rootValue: 100, propList: ["*"] }));
-  }
+  // if (!/node_modules/.test(api.file)) {
+  //   plugins.unshift(px2rem({ rootValue: 100, propList: ["*"] }));
+  // }
   return {
     // You can specify any options from https://postcss.org/api/#processoptions here
     plugins,

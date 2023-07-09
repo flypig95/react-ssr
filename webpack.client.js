@@ -13,12 +13,12 @@ const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true"; // 是�
 
 const config = {
   mode: isDev ? "development" : "production",
-  entry: "./src/client/index.jsx",
+  entry: "./src/index.jsx",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].[contenthash:6].js",
     chunkFilename: "[name].[contenthash:6].js",
-    // publicPath: '/dist',
+    publicPath: isDev ? "/" : "//static.zuifuli/",
   },
   module: {
     rules: [
@@ -33,19 +33,23 @@ const config = {
         },
       },
       {
-        test: /\.(png|jpg|gif|jpeg|svg)$/,
-        type: "asset/resource",
+        test: /\.(png|jpg|gif|jpeg|svg|webp)$/,
+        type: "asset",
         parser: {
-          detaUrlCondition: {
-            maxSize: 1 * 1024, // 1kb
+          dataUrlCondition: {
+            maxSize: 8 * 1024, // 8kb 默认值
           },
+        },
+        generator: {
+          publicPath: "/images/",
+          outputPath: "images/",
         },
       },
       {
         test: /\.(ttf|otf|woff|woff2|eot)$/,
-        type: "asset/inline",
+        type: "asset",
         parser: {
-          detaUrlCondition: {
+          dataUrlCondition: {
             maxSize: 8 * 1024, // 8kb
           },
         },
@@ -89,7 +93,7 @@ const config = {
   },
   plugins: [
     new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ["**/*", "!app.js"],
+      cleanOnceBeforeBuildPatterns: ["**/*", "!app*"],
     }),
     new HtmlWebpackPlugin({
       title: "react-ssr",
@@ -102,11 +106,8 @@ const config = {
     }),
     new webpack.DefinePlugin({
       __STYLE_ISOMORPHIC__: JSON.stringify(isStyleIsomorphic),
+      __dev__: JSON.stringify(isDev),
     }),
-    // new MiniCssExtractPlugin({
-    //   filename: `[name].[contenthash:6].css`,
-    //   chunkFilename: `[name].[contenthash:6].css`,
-    // }),
     // new ModuleFederationPlugin({
     //   name: 'pc',
     //   filename: 'remoteEntry.js',
@@ -122,23 +123,6 @@ const config = {
     cacheDirectory: path.join(__dirname, "node_modules/.cac/webpack"),
   },
   watch: isDev,
-  // devServer: {
-  //   static: path.resolve(__dirname, "dist"),
-  //   open: true,
-  //   port: 9000,
-  //   // proxy: {
-  //   //   '/app-api': {
-  //   //     target: 'http://api.gymuseum.cn',
-  //   //     secure: false,
-  //   //     changeOrigin: true,
-  //   //   },
-  //   // },
-  //   // historyApiFallback: {
-  //   //   rewrites:[
-  //   //     { from: /./, to: '/index.html' },
-  //   //   ]
-  //   // },
-  // },
 };
 
 // 样式处理start

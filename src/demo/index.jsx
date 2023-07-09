@@ -4,7 +4,7 @@ import useStyles from "isomorphic-style-loader/useStyles";
 import { GET_LIST } from "./reducer";
 import * as service from "./service";
 import Header from "./Header";
-import s from "../common/base.less";
+import s from "../styles/base.less";
 export default function Demo() {
   useStyles(s);
   const state = useSelector((state) => state.demo) || {};
@@ -15,7 +15,7 @@ export default function Demo() {
   );
 }
 
-Demo.loadData = (store) => {
+Demo.loadData = (store, { req }) => {
   return Promise.all([service.getNewData()]).then(([data]) => {
     store.dispatch({
       type: GET_LIST,

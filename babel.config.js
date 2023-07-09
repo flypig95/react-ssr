@@ -1,5 +1,6 @@
 module.exports = (api) => {
   api.cache.using(() => process.env.NODE_ENV === "dev");
+  const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true"; // 是否样式同构
 
   const config = {
     env: {
@@ -58,6 +59,15 @@ module.exports = (api) => {
       },
     },
   };
+
+  if (!isStyleIsomorphic) {
+    config.env.node.plugins.push([
+      "babel-plugin-transform-require-ignore",
+      {
+        extensions: [".less", ".css"],
+      },
+    ]);
+  }
 
   return config;
 };

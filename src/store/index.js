@@ -1,5 +1,10 @@
-import { createStore, combineReducers } from "redux";
-import demoReducer from "~/client/demo/reducer";
+import {
+  legacy_createStore as createStore,
+  combineReducers,
+  applyMiddleware,
+} from "redux";
+import thunk from "redux-thunk";
+import demoReducer from "~/demo/reducer";
 
 const rootReducer = combineReducers({
   demo: demoReducer,
@@ -7,4 +12,4 @@ const rootReducer = combineReducers({
 
 const initState = typeof window === "undefined" ? {} : window.__data || {};
 
-export default createStore(rootReducer, initState);
+export default createStore(rootReducer, initState, applyMiddleware(thunk));

@@ -24,7 +24,7 @@ module.exports = {
   },
   globals: {
     // 全局变量
-    __env__: true, // 全局变量__dev__就不会eslint报错
+    __dev__: true, // 全局变量__dev__就不会eslint报错
     __STYLE_ISOMORPHIC__: true,
   },
   rules: {

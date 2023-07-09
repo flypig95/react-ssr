@@ -4,9 +4,11 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import { ConfigProvider } from "antd";
+import zhCN from "antd/locale/zh_CN";
 import { Provider } from "react-redux";
 import StyleContext from "isomorphic-style-loader/StyleContext";
-import routes from "../routes";
+import routes from "./routes";
 import store from "~/store";
 
 const isStyleIsomorphic = __STYLE_ISOMORPHIC__; // 样式同构
@@ -26,9 +28,11 @@ const router = createBrowserRouter(routes);
 
 export default function App() {
   const content = (
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
+    <ConfigProvider locale={zhCN}>
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
+    </ConfigProvider>
   );
   return isStyleIsomorphic ? (
     <StyleContext.Provider value={{ insertCss }}>

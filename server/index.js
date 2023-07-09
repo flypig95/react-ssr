@@ -1,8 +1,9 @@
 import path from "path";
 import fs from "fs";
 import express from "express";
-import routes from "../routes";
+import routes from "../src/routes";
 import { matchPath } from "react-router-dom";
+import cookieParser from "cookie-parser";
 import render from "./render";
 import store from "~/store";
 
@@ -10,7 +11,6 @@ import store from "~/store";
  保证node服务器稳定
  1、同步代码的错误，错误处理中间件
  2、异步代码（promise）错误，loadData中所有的请求都要放在promise.all中，并且返回promise.all()
- 3、使用pm2做进程管理，自动重启
  */
 
 // process.on("uncaughtException", function (err) {
@@ -19,6 +19,9 @@ import store from "~/store";
 
 const app = express();
 app.use(express.static("dist"));
+app.use(cookieParser());
+app.disable("x-powered-by");
+app.enable("trust proxy");
 
 // 中间件不要加async，否则错误处理中间件无法执行
 app.get("*", function (req, res) {
@@ -42,7 +45,7 @@ app.get("*", function (req, res) {
           unsubscribe();
         });
 
-        loadData(store).catch((err) => {
+        loadData(store, { req }).catch((err) => {
           toClientRender(res);
           unsubscribe();
         });
@@ -67,7 +70,7 @@ function toClientRender(res) {
   res.sendFile(path.resolve(process.cwd(), "dist/ssr.html"));
 }
 
-const server = app.listen(8080, function (err, a) {
+const server = app.listen(8080, "127.0.0.1", function (err, a) {
   const host = server.address().address;
   const port = server.address().port;
   console.log("应用实例，访问地址为 http://%s:%s", host, port);

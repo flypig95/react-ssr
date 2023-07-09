@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import StyleContext from "isomorphic-style-loader/StyleContext";
 import { Helmet } from "react-helmet";
 import store from "~/store";
-import routes from "../routes";
+import routes from "../src/routes";
 
 const render = ({ url, route }) => {
   const css = new Set(); // CSS for all rendered React components

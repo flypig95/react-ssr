@@ -1,6 +1,5 @@
 module.exports = (api) => {
   api.cache.using(() => process.env.NODE_ENV === "dev");
-  const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true"; // 是否样式同构
 
   const config = {
     env: {
@@ -34,8 +33,8 @@ module.exports = (api) => {
               corejs: false,
             },
           ],
-          // "@babel/plugin-syntax-dynamic-import",
           // "@babel/plugin-proposal-class-properties",
+          // "@babel/plugin-syntax-dynamic-import", // @babel/core 7.8.0及以上 已经包含这个plugin
         ],
       },
       node: {
@@ -43,6 +42,11 @@ module.exports = (api) => {
           [
             "@babel/preset-env",
             {
+              useBuiltIns: "usage", // 根据targets目标浏览器按需加载polyfill, 会自动的引入@babel/polyfill
+              corejs: {
+                version: 3,
+                proposals: true, // 是否实现提案阶段中的特性/功能
+              },
               targets: {
                 node: "current",
               },
@@ -52,22 +56,18 @@ module.exports = (api) => {
           "@babel/preset-react",
         ],
         plugins: [
-          "@babel/plugin-transform-runtime",
-          // "@babel/plugin-syntax-dynamic-import",
+          [
+            "@babel/plugin-transform-runtime",
+            {
+              corejs: false,
+            },
+          ],
           // "@babel/plugin-proposal-class-properties",
+          // "@babel/plugin-syntax-dynamic-import",
         ],
       },
     },
   };
-
-  if (!isStyleIsomorphic) {
-    config.env.node.plugins.push([
-      "babel-plugin-transform-require-ignore",
-      {
-        extensions: [".less", ".css"],
-      },
-    ]);
-  }
 
   return config;
 };

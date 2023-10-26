@@ -4,21 +4,31 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const webpack = require("webpack");
+const pkg = require("./package.json");
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // const { ModuleFederationPlugin } = require('webpack').container;
-
-const isDev = process.env.NODE_ENV === "dev";
-const isPrd = process.env.NODE_ENV === "prd";
 process.env.BABEL_ENV = "browsers"; //指定 babel 编译环境
-const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true"; // 是否样式同构
+const env = process.env.NODE_ENV;
+const isDev = env === "dev";
+const isPrd = env === "prd";
+
+const outputPath = {
+  dev: `t-dist/${pkg.name}/`,
+  test: `t-dist/${pkg.name}/`,
+  prd: `dist/${pkg.name}/`,
+};
+const cdnPath = `https://static.zuifuli.com/${env}/${pkg.name}/`;
+const publicPath = isDev ? "/" : cdnPath;
+const filenamePrefix = `${env}.pc.[name].[contenthash:6]`;
 
 const config = {
   mode: isDev ? "development" : "production",
   entry: "./src/index.jsx",
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "[name].[contenthash:6].js",
-    chunkFilename: "[name].[contenthash:6].js",
-    publicPath: isDev ? "/" : "//static.zuifuli/",
+    path: path.resolve(__dirname, outputPath[env]),
+    filename: `${filenamePrefix}.js`,
+    chunkFilename: `${filenamePrefix}.js`,
+    publicPath,
   },
   module: {
     rules: [
@@ -33,6 +43,14 @@ const config = {
         },
       },
       {
+        test: /\.less$/,
+        use: getStyleLoaders(),
+      },
+      {
+        test: /\.css$/,
+        use: getStyleLoaders(true),
+      },
+      {
         test: /\.(png|jpg|gif|jpeg|svg|webp)$/,
         type: "asset",
         parser: {
@@ -41,8 +59,8 @@ const config = {
           },
         },
         generator: {
-          publicPath: "/images/",
           outputPath: "images/",
+          publicPath: isDev ? `/images/` : `${cdnPath}images/`,
         },
       },
       {
@@ -68,7 +86,7 @@ const config = {
     // usedExports: isPrd,
     // sideEffects: isPrd,
     // minimize: isPrd,
-    minimizer: isStyleIsomorphic ? [`...`] : [`...`, new CssMinimizerPlugin()],
+    minimizer: [`...`, new CssMinimizerPlugin()],
     splitChunks: {
       name: false,
       cacheGroups: {
@@ -92,31 +110,27 @@ const config = {
     // },
   },
   plugins: [
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ["**/*", "!app*"],
-    }),
+    //     new CleanWebpackPlugin({
+    //   cleanOnceBeforeBuildPatterns: ["**/*", "!app*"],
+    // }),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: "react-ssr",
       template: "./index.html",
-      favicon: "./favicon.ico",
       filename: "ssr.html",
+      // favicon: "./public/favicon.ico",
+      // ...htmlWebpackPluginOpts,
       // minify: {
       //   collapseWhitespace: true, //删除空格、换行
       // },
     }),
+    new MiniCssExtractPlugin({
+      filename: `${filenamePrefix}.css`,
+      chunkFilename: `${filenamePrefix}.css`,
+    }),
     new webpack.DefinePlugin({
-      __STYLE_ISOMORPHIC__: JSON.stringify(isStyleIsomorphic),
       __dev__: JSON.stringify(isDev),
     }),
-    // new ModuleFederationPlugin({
-    //   name: 'pc',
-    //   filename: 'remoteEntry.js',
-    //   exposes: {
-    //     './Footer': './src/home/Footer.jsx'
-    //   },
-    //   remote: {},
-    //   // shared: ['react']
-    // })
+    // new BundleAnalyzerPlugin()
   ],
   cache: {
     type: "filesystem",
@@ -128,6 +142,11 @@ const config = {
 // 样式处理start
 function getStyleLoaders(useCss = false) {
   const loaders = [
+    isDev
+      ? { loader: "style-loader" }
+      : {
+          loader: MiniCssExtractPlugin.loader,
+        },
     {
       loader: "css-loader",
       options: {
@@ -146,59 +165,19 @@ function getStyleLoaders(useCss = false) {
       loader: "less-loader",
       options: {
         sourceMap: isDev,
+        lessOptions: {
+          modifyVars: {
+            "@primary-color": "#ff5d0d",
+          },
+        },
       },
     },
   ];
   if (useCss) {
     loaders.pop();
   }
-  if (isPrd) {
-    loaders.unshift({
-      loader: MiniCssExtractPlugin.loader,
-    });
-  }
-  if (isDev) {
-    loaders.unshift({ loader: "style-loader" });
-  }
   return loaders;
 }
 
-const styleIsomorphicRules = {
-  test: /\.(css|less)?$/,
-  use: [
-    "isomorphic-style-loader",
-    {
-      loader: "css-loader",
-      options: {
-        esModule: false,
-        modules: true,
-      },
-    },
-    "postcss-loader",
-    "less-loader",
-  ],
-};
-const styleRules = [
-  {
-    test: /\.less$/,
-    use: getStyleLoaders(),
-  },
-  {
-    test: /\.css$/,
-    use: getStyleLoaders(true),
-  },
-];
-if (isStyleIsomorphic) {
-  config.module.rules.push(styleIsomorphicRules);
-} else {
-  config.module.rules = config.module.rules.concat(styleRules);
-  config.plugins.push(
-    new MiniCssExtractPlugin({
-      filename: `[name].[contenthash:6].css`,
-      chunkFilename: `[name].[contenthash:6].css`,
-    })
-  );
-}
 // 样式处理end
-
 module.exports = config;

@@ -17,28 +17,26 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { GET_LIST } from "./reducer";
 import * as service from "./service";
-import Content from "./Content";
+import Header from "./Header";
+import "../styles/base.less";
 export default function Demo() {
   const state = useSelector((state) => state.demo) || {};
   return (
     <div className="page-home">
-      <Content />
+      <Header />
     </div>
   );
 }
 
-Demo.loadData = (store) =>
-  Promise.all([service.getNewData()]).then(([data]) => {
+Demo.loadData = (store, { req }) => {
+  return Promise.all([service.getNewData()]).then(([data]) => {
     store.dispatch({
       type: GET_LIST,
       payload: data,
     });
   });
+};
 ```
-
-3. 支持样式同构，设置 node 环境变量 NODE_STYLE_ISOMORPHIC=true, 如 pacakge.json-->script-->dev:client。然后访问 http://localhost:8080/demo。
-样式同构可以避免页面闪动的问题，启用样式同构后需以 css modues 的形式编写样式。
-使用 rem 单位时无法避免页面闪动，此时不推荐启用样式同构。
 
 ## 保证 node 服务器稳定的措施
 

@@ -1,12 +1,12 @@
 import path from "path";
-import fs from "fs";
 import express from "express";
 import routes from "../src/routes";
 import { matchPath } from "react-router-dom";
 import cookieParser from "cookie-parser";
-import render from "./render";
+import favicon from "serve-favicon";
 import store from "~/store";
-
+import { getOutputDir } from "./helper";
+import { render } from "./render";
 /*
  保证node服务器稳定
  1、同步代码的错误，错误处理中间件
@@ -18,60 +18,60 @@ import store from "~/store";
 // });
 
 const app = express();
-app.use(express.static("dist"));
-app.use(cookieParser());
 app.disable("x-powered-by");
 app.enable("trust proxy");
+app.use(favicon(path.resolve(process.cwd(), "public/favicon.ico")));
+app.use(express.static("public"));
+app.use(express.static(getOutputDir()));
+app.use(cookieParser());
+app.use(
+  express.json({
+    type: "*/*",
+  })
+);
 
-// 中间件不要加async，否则错误处理中间件无法执行
-app.get("*", function (req, res) {
-  const route = routes.filter((route) => matchPath(route, req.url))[0];
+// 此中间件不要加async，否则错误处理中间件无法执行
+app.get("*", function (req, res, next) {
+  const url = req.path;
+  const route = routes.filter((route) => matchPath(route, url))[0];
   if (route) {
-    if (route.loadData) route.ssr = true;
-    const { loadData, ssr } = route;
-    if (ssr) {
-      if (loadData) {
-        const unsubscribe = store.subscribe(() => {
-          let html = "";
-          try {
-            html = render({ url: req.url, route });
-          } catch (err) {
-            html = fs.readFileSync(
-              path.resolve(process.cwd(), "dist/ssr.html"),
-              "utf8"
-            );
-          }
-          res.send(html);
-          unsubscribe();
+    let { loadData, ssr } = route;
+    if (loadData) ssr = true;
+    if (loadData) {
+      const unsubscribe = store.subscribe(() => {
+        const bootstrapScriptContent = `window.__data=${JSON.stringify(
+          store.getState()
+        )}`;
+        render({
+          req,
+          res,
+          ssr,
+          renderToPiStrProps: { bootstrapScriptContent },
         });
-
-        loadData(store, { req }).catch((err) => {
-          toClientRender(res);
-          unsubscribe();
-        });
-      } else {
-        res.send(render({ url: req.url, route }));
-      }
+        unsubscribe();
+      });
+      route.loadData(store, { req }).catch(() => {
+        render({ req, res, ssr: false });
+        unsubscribe();
+      });
     } else {
-      toClientRender(res);
+      render({ req, res, ssr });
     }
   } else {
-    res.sendStatus(404);
+    next();
   }
 });
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
   console.log("错误处理中间件", err);
-  toClientRender(res);
+  render({ req, res, ssr: false });
 });
 
-function toClientRender(res) {
-  res.sendFile(path.resolve(process.cwd(), "dist/ssr.html"));
-}
+const PORT = process.env.PORT || 8080;
 
-const server = app.listen(8080, "127.0.0.1", function (err, a) {
-  const host = server.address().address;
-  const port = server.address().port;
-  console.log("应用实例，访问地址为 http://%s:%s", host, port);
+app.listen(PORT, function (err) {
+  console.info(
+    `==> 🍺  Express server running at port ${PORT}, at ${new Date().toLocaleString()}`
+  );
 });

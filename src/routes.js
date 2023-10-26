@@ -1,12 +1,12 @@
-import Login from "./login";
+import { lazy } from "react";
 import Demo from "./demo";
 
 const routers = [
   {
     path: "/login",
     exact: true,
-    ssr: true,
-    Component: Login,
+    ssr: false,
+    Component: lazy(() => import("./login")),
   },
   {
     path: "/demo",

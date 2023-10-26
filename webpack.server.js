@@ -1,18 +1,15 @@
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const webpack = require("webpack");
 
-const isDev = process.env.NODE_ENV === "dev";
-const isPrd = process.env.NODE_ENV === "prd";
 process.env.BABEL_ENV = "node"; //设置 babel 的运行环境
-const isStyleIsomorphic = process.env.NODE_STYLE_ISOMORPHIC === "true"; // 是否样式同构
+const isDev = process.env.NODE_ENV === "dev";
 
 const config = {
   mode: isDev ? "development" : "production",
   entry: "./server/index.js",
   externalsPresets: { node: true },
-  externals: [nodeExternals({ allowlist: [/\.css$/] })],
+  externals: [nodeExternals({ allowlist: [/\.css$/] })], // 排除的node_modules中的库（允许animation.css这类的样式库）
   module: {
     rules: [
       {
@@ -22,6 +19,14 @@ const config = {
           loader: "babel-loader",
           options: {
             cacheDirectory: true,
+            plugins: [
+              [
+                "babel-plugin-transform-require-ignore",
+                {
+                  extensions: [".less", ".css"],
+                },
+              ],
+            ],
           },
         },
       },
@@ -34,17 +39,17 @@ const config = {
           },
         },
         generator: {
-          publicPath: "/images/",
-          outputPath: "images/",
+          publicPath: `/images/`,
+          outputPath: `images/`,
         },
       },
     ],
   },
   output: {
     filename: "app.js",
-    path: path.resolve(__dirname, "./dist"),
+    path: path.resolve(__dirname, "dist-ssr"),
+    // publicPath,
   },
-  devtool: isDev ? "eval-cheap-module-source-map" : false,
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
@@ -52,32 +57,11 @@ const config = {
     },
   },
   plugins: [
-    // new CleanWebpackPlugin({
-    //   cleanOnceBeforeBuildPatterns: ["**/*", "!app*", "!ssr.html", '!favicon.icon'],
-    // }),
     new webpack.DefinePlugin({
-      __STYLE_ISOMORPHIC__: JSON.stringify(isStyleIsomorphic),
       __dev__: JSON.stringify(isDev),
     }),
   ],
   watch: isDev,
 };
-
-if (isStyleIsomorphic)
-  config.module.rules.push({
-    test: /\.(css|less)?$/,
-    use: [
-      "isomorphic-style-loader",
-      {
-        loader: "css-loader",
-        options: {
-          esModule: false,
-          modules: true,
-        },
-      },
-      "postcss-loader",
-      "less-loader",
-    ],
-  });
 
 module.exports = config;

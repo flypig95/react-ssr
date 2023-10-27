@@ -1,5 +1,5 @@
 # React 服务端渲染
-react、redux、less、express、webpack
+使用react18中的renderToPipeableStream流式渲染，以支持服务端渲染时能够使用react.lazy和Suspense进行代码拆分。（react18、redux、less、express、webpack）
 
 ## 启动项目
 
